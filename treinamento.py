@@ -110,3 +110,27 @@ def plotar_resultados(historico):
 
 # Plotar os resultados do treinamento
 plotar_resultados(historico)
+
+# Função para prever e cancelar ruído
+def identificar_e_cancelar_ruido(audio_path, modelo):
+    # Carregar o áudio
+    audio, sr = librosa.load(audio_path, sr=None)
+    
+    # Converter para espectrograma de mel
+    mel_spectrogram = librosa.feature.melspectrogram(y=audio, sr=sr, n_mels=128)
+    mel_spectrogram_db = librosa.power_to_db(mel_spectrogram, ref=np.max)
+    
+    # Normalizar ou adaptar o espectrograma ao formato esperado pelo modelo
+    mel_spectrogram_db = mel_spectrogram_db[..., np.newaxis]  # Adicionar dimensão extra para canal
+    predicao = modelo.predict(mel_spectrogram_db[np.newaxis, ...])
+
+    # Identificar a classe prevista
+    classe_prevista = np.argmax(predicao, axis=1)
+    print(f'Som identificado: {label_encoder.inverse_transform(classe_prevista)}')
+
+    # Lógica para cancelar o ruído do áudio baseado na faixa identificada
+    # (aqui você deve implementar a lógica específica para o cancelamento de ruído)
+
+# Exemplo de uso
+audio_path = './dataset/dog/1d28b9cb.wav'  # Insira o caminho do seu arquivo de áudio aqui
+identificar_e_cancelar_ruido(audio_path, modelo)
